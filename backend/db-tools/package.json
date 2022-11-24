@@ -1,0 +1,11 @@
+{
+  "name": "db-tools",
+  "engines": {
+    "node": "16"
+  },
+  "main": "index.js",
+  "dependencies": {
+    "pngjs": "^6.0.0",
+    "firebase-admin": "^11.3.0"
+  }
+}
