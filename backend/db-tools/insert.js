@@ -30,9 +30,9 @@ async function main() {
 
     }
 
-  /*  const hexColors = Object.keys(colors)
-
     const allColors = []
+    const colorIndex = {}
+    const hexColors = Object.keys(colors)
 
     for (let i = 0; i < hexColors.length; i++) {
 
@@ -42,27 +42,35 @@ async function main() {
             hex: hexColor,
             rgb: colors[hexColor]
         }
+
+        colorIndex[hexColor] = i
+
     }
 
-    await admin.database().ref('metadata/colors').update(
-        allColors,
-        () => {
+    for (let i = 0; i < pixels.length; i++) {
 
-            console.log('finished')
+        const pixel = pixels[i]
 
+        pixels[i] = {
+            index: i,
+            color: colorIndex[ColorUtils.rgbToHex(pixel.r, pixel.g, pixel.b)]
         }
-    );*/
+    }
+
+    fs.writeFileSync('./data/pixels.json', JSON.stringify(pixels))
+
+    /*
 
 
-    await admin.database().ref('pixels').update(
-        pixels,
-        () => {
+      await admin.database().ref('metadata/colors').update(
+          allColors,
+          () => {
 
-            console.log('finished')
+              console.log('finished')
 
-        }
-    );
+          }
 
+      );*/
 
 
 }

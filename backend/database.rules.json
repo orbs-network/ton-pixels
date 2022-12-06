@@ -2,9 +2,17 @@
   "rules": {
     ".read": false,
     ".write": false,
-    "colors": {
+    "pixels": {
       ".read": true,
       ".write": false
     },
+    "metadata": {
+      ".read": false,
+      ".write": false,
+      "colors": {
+        ".read": true,
+        ".write": false
+      }
+    }
   }
 }

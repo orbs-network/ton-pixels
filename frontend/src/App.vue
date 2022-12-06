@@ -11,6 +11,31 @@
 
       <canvas id="canvas" width="1000" height="1000"></canvas>
 
+      <div class="pixel" style="">
+
+<!--        <div height="120%" width="120%">
+
+          <svg fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" height="120%" width="120%">
+
+            <g stroke-opacity=".6" stroke-width="2">
+              <g stroke="#000">
+                <path d="m3 9v-6h6"></path>
+                <path d="m14.9999 3h6v6"></path>
+                <path d="m20.9999 15.0001v6h-6"></path>
+                <path d="m9 21.0001h-6v-6"></path>
+              </g>
+              <path d="m1 9v-8h8" stroke="#fff"></path>
+              <path d="m15 1h8v8" stroke="#fff"></path>
+              <path d="m23 15v8h-8" stroke="#fff"></path>
+              <path d="m9 23h-8v-8" stroke="#fff"></path>
+            </g>
+
+          </svg>
+
+        </div>-->
+
+      </div>
+
     </div>
 
   </div>
@@ -22,7 +47,6 @@
 import {get, getDatabase, ref} from "firebase/database";
 import {initializeApp} from "firebase/app";
 import './scss/style.scss'
-import ColorUtils from './utils/ColorUtils'
 import panzoom from 'panzoom'
 
 const numberFormatter = Intl.NumberFormat('en');
@@ -67,13 +91,13 @@ export default {
 
     const fbDb = getDatabase(app)
 
-    this.pixelsRef = ref(fbDb, 'pixels')
+    const pixelsRef = ref(fbDb, 'pixels')
 
-    const colorsRef = ref(fbDb, 'colors')
+    const colorsRef = ref(fbDb, 'metadata/colors')
 
     this.colors = (await get(colorsRef)).val()
 
-    this.pixels = []
+    this.pixels = (await get(pixelsRef)).val()
 
     await this.initCanvas()
 
@@ -94,35 +118,33 @@ export default {
       const image = ctx.createImageData(canvas.width, canvas.height);
       const data = image.data;
 
-      function drawPixel(x, y, color) {
-        const roundedX = Math.round(x);
-        const roundedY = Math.round(y);
+      const drawPixel = (pixel) => {
 
-        const index = 4 * (canvas.width * roundedY + roundedX);
+        const x = pixel.index % 1000
+        const y = parseInt(pixel.index / 1000)
 
-        data[index + 0] = color.r;
-        data[index + 1] = color.g;
-        data[index + 2] = color.b;
-        data[index + 3] = color.a;
+        const index = 4 * (canvas.width * y + x);
+
+        const colorRGB = this.colors[pixel.color].rgb
+
+        data[index] = colorRGB.r
+        data[index + 1] = colorRGB.g
+        data[index + 2] = colorRGB.b
+        data[index + 3] = 255
+
       }
 
       function swapBuffer() {
         ctx.putImageData(image, 0, 0);
       }
 
-      for (let x = 0; x < 1000; ++x) {
+      for (const pixel of this.pixels) {
 
-        for (let y = 0; y < 1000; ++y) {
-
-          const color = this.colors[Math.floor(Math.random() * 32)];
-
-          drawPixel(x, y, color);
-        }
-
-        swapBuffer();
-
+        drawPixel(pixel);
 
       }
+
+      swapBuffer();
 
     }
 
